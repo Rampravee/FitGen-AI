@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>FitGen AI</title>
+  <link rel="shortcut icon" href="favicon.png" type="image/x-icon">
+
+<style>
+
+body {
+  margin: 0;
+  background: #060606;
+  font-family: Arial, sans-serif;
+  color: white;
+}
+
+.topbar {
+  height: 60px;
+  background: #0b0b0b;
+  border-bottom: 1px solid #1f1f1f;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 24px;
+}
+
+.main-nav {
+  display: flex;
+  gap: 18px;
+}
+
+.nav-btn {
+  background: transparent;
+  border: none;
+  color: #cfcfcf;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 8px 14px;
+  border-radius: 8px;
+  transition: 0.2s ease;
+}
+
+.nav-btn:hover {
+  background: rgba(255, 0, 0, 0.15);
+  color: white;
+}
+
+.nav-btn.active {
+  background: linear-gradient(135deg, #e10600, #b80000);
+  color: white;
+  box-shadow: 0 6px 18px rgba(225,6,0,0.4);
+}
+
+.user-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+
+.logo { font-size: 20px; font-weight: 700; }
+.logo span { color: red; }
+
+.top-right { display: flex; align-items: center; gap: 12px; }
+
+.avatar {
+  background: red;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+
+.dropdown {
+  position: absolute;
+  top: 60px;
+  right: 20px;
+  background: #0f0f0f;
+  display: none;
+  flex-direction: column;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+}
+
+.dropdown button {
+  padding: 12px 16px;
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  text-align: left;
+}
+
+.dropdown button:hover { background: red; }
+
+.main { padding: 24px; }
+
+.section { display: none; }
+.section.active { display: block; }
+
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.card {
+  background: linear-gradient(180deg, #121212, #0b0b0b);
+  padding: 20px 24px;
+  border-radius: 18px;
+  border: 1px solid #1f1f1f;
+  margin-bottom: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  line-height: 1.7;
+  font-size: 14.5px;
+}
+
+.card b {
+  display: block;
+  font-size: 17px;
+  margin-bottom: 10px;
+  color: #ff2d2d;
+}
+
+#workoutContent {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 22px;
+}
+
+.card br {
+  margin-bottom: 6px;
+}
+
+
+.module {
+  background: linear-gradient(180deg, #0f0f0f, #090909);
+  padding: 28px;
+  border-radius: 20px;
+  margin-top: 24px;
+  border: 1px solid #1f1f1f;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px 22px;
+}
+
+.grid input,
+.grid select {
+  height: 52px;
+  padding: 0 16px;
+  border-radius: 14px;
+  border: 1px solid #1f1f1f;
+  background: #141414;
+  color: white;
+}
+
+
+#fitnessForm button {
+  grid-column: span 2;
+  width: 320px;
+  margin: 20px auto 0 auto;
+  height: 56px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #e10600, #b80000);
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+  display: block;
+}
+
+#fitgen-chat-btn {
+  position: fixed;
+  bottom: 25px;
+  right: 25px;
+  width: 60px;
+  height: 60px;
+  background: #e10600;
+  color: white;
+  font-size: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 999999;
+}
+
+#chat-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: #00ff6a;
+  color: #000;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 6px;
+  border-radius: 999px;
+}
+
+#fitgen-chat-box {
+  position: fixed;
+  bottom: 100px;
+  right: 25px;
+  width: 340px;
+  height: 460px;
+  background: #0f0f0f;
+  display: none;
+  flex-direction: column;
+  border-radius: 24px;
+  overflow: hidden;
+  z-index: 999999;
+}
+
+.chat-header {
+  background: #121212;
+  padding: 14px 18px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.chat-body {
+  flex: 1;
+  padding: 16px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.chat-footer {
+  display: flex;
+  gap: 8px;
+  padding: 12px;
+  background: #0b0b0b;
+}
+
+.user-msg {
+  align-self: flex-end;
+  background: red;
+  padding: 10px 16px;
+  border-radius: 18px;
+}
+
+.bot-msg {
+  align-self: flex-start;
+  background: #1a1a1a;
+  padding: 10px 16px;
+  border-radius: 18px;
+}
+
+.card {
+  cursor: pointer;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.card:hover {
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 15px 45px rgba(255, 0, 0, 0.35);
+}
+
+.workout-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  backdrop-filter: blur(6px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 999999;
+}
+
+.workout-overlay.active {
+  display: flex;
+}
+
+.workout-popup {
+  background: linear-gradient(180deg, #121212, #0a0a0a);
+  width: 92%;
+  max-width: 520px;
+  max-height: 85vh;
+  overflow-y: auto;
+  padding: 28px 30px;
+  border-radius: 22px;
+  border: 1px solid #2a2a2a;
+  box-shadow: 0 25px 60px rgba(0,0,0,0.8);
+  animation: popupZoom 0.25s ease;
+}
+
+@keyframes popupZoom {
+  from { transform: scale(0.85); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
+.popup-close {
+  float: right;
+  font-size: 18px;
+  color: #ff3b3b;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+#fitgen-chat-btn {
+  position: fixed;
+  bottom: 25px;
+  right: 25px;
+  width: 60px;
+  height: 60px;
+  background: radial-gradient(circle at top left, #ff3b3b, #b80000);
+  color: white;
+  font-size: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 999999;
+  box-shadow: 0 10px 30px rgba(255,0,0,0.45);
+}
+
+#fitgen-chat-box {
+  position: fixed;
+  bottom: 100px;
+  right: 25px;
+  width: 360px;
+  height: 500px;
+  background: linear-gradient(180deg, #111, #050505);
+  display: none;
+  flex-direction: column;
+  border-radius: 24px;
+  overflow: hidden;
+  z-index: 999999;
+  box-shadow: 0 25px 70px rgba(0,0,0,0.9);
+}
+
+.chat-header {
+  background: linear-gradient(135deg, #1a1a1a, #0f0f0f);
+  padding: 16px 18px;
+  font-weight: 700;
+  font-size: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #1f1f1f;
+}
+
+#chat-close {
+  cursor: pointer;
+  font-size: 18px;
+  color: #ff4d4d;
+}
+
+.chat-body {
+  flex: 1;
+  padding: 16px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.bot-msg {
+  align-self: flex-start;
+  background: #1b1b1b;
+  padding: 14px 16px;
+  border-radius: 16px;
+  font-size: 14px;
+  line-height: 1.6;
+  max-width: 85%;
+  box-shadow: 0 6px 12px rgba(0,0,0,0.6);
+}
+
+.user-msg {
+  align-self: flex-end;
+  background: linear-gradient(135deg, #ff2b2b, #b80000);
+  padding: 12px 16px;
+  border-radius: 16px;
+  color: white;
+  max-width: 80%;
+  font-size: 14px;
+}
+
+.chat-footer {
+  display: flex;
+  gap: 8px;
+  padding: 12px;
+  background: #0c0c0c;
+  border-top: 1px solid #1f1f1f;
+}
+
+#chat-input {
+  flex: 1;
+  border-radius: 10px;
+  padding: 10px 12px;
+  background: #111;
+  border: 1px solid #1f1f1f;
+  color: white;
+  outline: none;
+}
+
+#chat-send {
+  background: linear-gradient(135deg, #ff2b2b, #b80000);
+  border: none;
+  border-radius: 10px;
+  padding: 0 18px;
+  color: white;
+  cursor: pointer;
+  font-weight: 700;
+  box-shadow: 0 5px 15px rgba(255,0,0,0.4);
+}
+
+.auth-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.auth-btn {
+  background: linear-gradient(135deg, #ff2b2b, #b80000);
+  border: none;
+  color: white;
+  padding: 7px 16px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.auth-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(255, 0, 0, 0.4);
+}
+
+#welcomeText {
+  font-weight: 600;
+  color: #ccc;
+}
+
+@media (max-width: 900px) {
+  .cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  #fitnessForm button {
+    width: 100%;
+  }
+
+  #workoutContent {
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  }
+
+  .topbar {
+    flex-direction: column;
+    height: auto;
+    padding: 12px;
+    gap: 10px;
+  }
+
+  .main-nav {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}
+
+
+@media (max-width: 600px) {
+
+  body {
+    font-size: 14px;
+  }
+
+  .cards {
+    grid-template-columns: 1fr;
+  }
+
+  .module {
+    padding: 20px;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  #fitnessForm button {
+    width: 100%;
+  }
+
+  #fitgen-chat-box {
+    width: 95%;
+    right: 2.5%;
+    height: 85vh;
+  }
+
+  #fitgen-chat-btn {
+    width: 52px;
+    height: 52px;
+    font-size: 22px;
+  }
+
+  .workout-popup {
+    width: 95%;
+    padding: 20px;
+  }
+
+  .nav-btn {
+    font-size: 12px;
+    padding: 6px 10px;
+  }
+
+  h2 {
+    font-size: 18px;
+  }
+
+  h3 {
+    font-size: 16px;
+  }
+
+  .card {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 400px) {
+
+  .logo {
+    font-size: 16px;
+  }
+
+  .nav-btn {
+    font-size: 11px;
+    padding: 5px 8px;
+  }
+
+  #fitgen-chat-box {
+    height: 90vh;
+  }
+}
+
+
+</style>
+</head>
+
+<body>
+
+<header class="topbar">
+  <div class="logo">FITGEN <span>AI</span></div>
+
+  <nav class="main-nav">
+    <button class="nav-btn active" data-section="dashboard">Dashboard</button>
+    <button class="nav-btn" data-section="workouts">Workouts</button>
+    <button class="nav-btn" data-section="diet">Diet</button>
+    <button class="nav-btn" data-section="profile">Profile</button>
+  </nav>
+
+  <div class="user-box auth-box">
+  <span id="welcomeText">Welcome, Guest</span>
+  <button class="auth-btn" id="loginBtn">Login</button>
+</div>
+
+</header>
+
+<main class="main">
+
+<section id="dashboard" class="section active">
+  <h2>Dashboard</h2>
+
+  <div class="cards">
+    <div class="card">BMI: <span id="bmiCard">--</span></div>
+    <div class="card">Daily Intake Calories: <span id="calCard">--</span></div>
+    <div class="card">Goal: <span id="goalCard">--</span></div>
+  </div>
+
+  <div class="module">
+    <h3>Create Fitness Plan</h3>
+    <form id="fitnessForm">
+      <div class="grid">
+        <input id="name" placeholder="Name" required>
+        <input id="age" type="number" placeholder="Age" required>
+        <input id="height" type="number" placeholder="Height (cm)" required>
+        <input id="weight" type="number" placeholder="Weight (kg)" required>
+
+        <select id="gender">
+          <option>Male</option>
+          <option>Female</option>
+        </select>
+
+        <select id="goal">
+          <option>Fat Loss</option>
+          <option>Muscle Gain</option>
+          <option>Maintenance</option>
+        </select>
+
+        <select id="dietType">
+          <option>Vegetarian</option>
+          <option>Non-Vegetarian</option>
+        </select>
+
+        <select id="time">
+          <option>30 Minutes</option>
+          <option>45 Minutes</option>
+          <option>60 Minutes</option>
+        </select>
+      </div>
+      <button type="submit">Generate</button>
+    </form>
+  </div>
+</section>
+
+<section id="workouts" class="section">
+  <h2>Workout Plans</h2>
+  <div id="workoutContent"></div>
+</section>
+
+<section id="diet" class="section">
+  <h2>Diet Planner</h2>
+  <div id="dietContent"></div>
+</section>
+
+<section id="progress" class="section"><h2>Progress</h2></section>
+<section id="profile" class="section"><h2>Profile</h2></section>
+
+</main>
+
+
+<div id="fitgen-chat-btn">💬 <span id="chat-badge">NEW</span></div>
+
+<div id="fitgen-chat-box">
+  <div class="chat-header">
+    FitGen AI <span id="chat-close">✖</span>
+  </div>
+  <div class="chat-body" id="chat-body"></div>
+  <div class="chat-footer">
+    <input id="chat-input" placeholder="Ask fitness question...">
+    <button id="chat-send">Send</button>
+  </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+
+  document.querySelectorAll(".nav-btn").forEach((btn) => {
+    btn.onclick = () => {
+
+      document.querySelectorAll(".nav-btn").forEach(b =>
+        b.classList.remove("active")
+      );
+
+      btn.classList.add("active");
+
+      document.querySelectorAll(".section").forEach(sec =>
+        sec.classList.remove("active")
+      );
+
+      document.getElementById(btn.dataset.section)
+        .classList.add("active");
+    };
+  });
+
+
+
+  const chatBtn   = document.getElementById("fitgen-chat-btn");
+  const chatBox   = document.getElementById("fitgen-chat-box");
+  const chatClose = document.getElementById("chat-close");
+  const chatSend  = document.getElementById("chat-send");
+  const chatInput = document.getElementById("chat-input");
+  const chatBody  = document.getElementById("chat-body");
+  const chatBadge = document.getElementById("chat-badge");
+
+  let greeted = false;
+
+  chatBtn.onclick = () => {
+    const isOpen = chatBox.style.display === "flex";
+    chatBox.style.display = isOpen ? "none" : "flex";
+
+    if (!isOpen && chatBadge) chatBadge.style.display = "none";
+
+    if (!isOpen && !greeted) {
+      chatBody.innerHTML += `
+        <div class="bot-msg">
+          👋 Hi! I'm <b>FitGen AI</b>, your personal fitness coach.<br><br>
+          ✅ Weight loss<br>
+          ✅ Muscle gain<br>
+          ✅ Diet planning<br>
+          ✅ Home & gym workouts<br><br>
+          How can I help you today?
+        </div>
+      `;
+      greeted = true;
+      chatBody.scrollTop = chatBody.scrollHeight;
+    }
+  };
+
+  chatClose.onclick = () => {
+    chatBox.style.display = "none";
+  };
+
+  chatSend.onclick = sendMessage;
+  chatInput.onkeypress = (e) => {
+    if (e.key === "Enter") sendMessage();
+  };
+
+  async function sendMessage() {
+    const msg = chatInput.value.trim();
+    if (!msg) return;
+
+    chatBody.innerHTML += `<div class="user-msg">${msg}</div>`;
+    chatInput.value = "";
+
+    const typingDiv = document.createElement("div");
+    typingDiv.className = "bot-msg";
+    typingDiv.innerText = "Typing...";
+    chatBody.appendChild(typingDiv);
+    chatBody.scrollTop = chatBody.scrollHeight;
+
+    try {
+      const res = await fetch(
+        "https://ramdtproject.app.n8n.cloud/webhook/Chatbot",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: msg }),
+        }
+      );
+
+      const data = await res.json();
+      typingDiv.innerText =
+        data.output || data.reply || data.message || "No reply received";
+
+    } catch {
+      typingDiv.innerText = "⚠️ Server error. Please try again.";
+    }
+  }
+
+
+  const fitnessForm    = document.getElementById("fitnessForm");
+  const workoutContent = document.getElementById("workoutContent");
+  const dietContent    = document.getElementById("dietContent");
+  const generateBtn    = fitnessForm.querySelector("button");
+
+  fitnessForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+
+    generateBtn.innerText = "Generating...";
+    generateBtn.disabled = true;
+
+    const userData = {
+      name: name.value,
+      age: age.value,
+      height: height.value,
+      weight: weight.value,
+      gender: gender.value,
+      goal: goal.value,
+      diet: dietType.value,
+      time: time.value,
+    };
+
+    workoutContent.innerHTML = "⏳ Generating workout with AI...";
+    dietContent.innerHTML = "⏳ Generating diet with AI...";
+
+    try {
+      const res = await fetch(
+        "https://ramdtproject.app.n8n.cloud/webhook/fitgen-ai",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(userData),
+        }
+      );
+
+      const raw = await res.json();
+
+ 
+      let data;
+      if (typeof raw.output === "string") {
+        const cleaned = raw.output
+          .replace("```json", "")
+          .replace("```", "")
+          .trim();
+        data = JSON.parse(cleaned);
+      } else {
+        data = raw;
+      }
+
+      document.getElementById("bmiCard").innerText = data.bmi;
+      document.getElementById("calCard").innerText = data.daily_calories;
+      document.getElementById("goalCard").innerText = goal.value;
+
+      workoutContent.innerHTML = "";
+      for (let day in data.workout_plan) {
+        workoutContent.innerHTML += `
+          <div class="card">
+            <b>${day}</b><br>
+            ${data.workout_plan[day].map(ex => "• " + ex).join("<br>")}
+          </div>`;
+      }
+
+
+dietContent.innerHTML = "";
+
+if (data.diet_plan && Object.keys(data.diet_plan).length > 0) {
+  for (let meal in data.diet_plan) {
+    dietContent.innerHTML += `
+      <div class="card">
+        <b>${meal}</b><br>
+        ${data.diet_plan[meal].join("<br>")}
+      </div>`;
+  }
+} else {
+  dietContent.innerHTML = `
+    <div class="card">
+      <b>Diet Plan</b><br>
+      ⚠️ Diet data not received from server.
+    </div>`;
+}
+
+
+
+      document.querySelector('[data-section="workouts"]').click();
+
+    } catch (err) {
+      workoutContent.innerHTML = "❌ Failed to load workout";
+      dietContent.innerHTML = "❌ Failed to load diet";
+      console.error("AI ERROR:", err);
+    }
+
+
+    generateBtn.innerText = "Generate";
+    generateBtn.disabled = false;
+  });
+
+});
+
+
+const overlay   = document.getElementById("workoutOverlay");
+const popupBox  = document.getElementById("workoutPopup");
+const popupText = document.getElementById("popupContent");
+const popupClose = document.getElementById("popupClose");
+
+
+document.addEventListener("click", (e) => {
+  const card = e.target.closest(".card");
+  if (!card) return;
+
+  popupText.innerHTML = card.innerHTML;
+  overlay.classList.add("active");
+});
+
+popupClose.onclick = () => overlay.classList.remove("active");
+
+overlay.onclick = (e) => {
+  if (e.target === overlay) overlay.classList.remove("active");
+};
+
+document.getElementById("loginBtn").onclick = () => {
+  window.location.href = "login.html";
+};
+
+const savedUser = localStorage.getItem("fitgenUser");
+if (savedUser) {
+  document.getElementById("welcomeText").innerText = "Welcome, " + savedUser;
+}
+
+</script>
+
+
+
+
+<div class="workout-overlay" id="workoutOverlay">
+  <div class="workout-popup" id="workoutPopup">
+    <span class="popup-close" id="popupClose">✖</span>
+    <div id="popupContent"></div>
+  </div>
+</div>
+
+</body>
+</html>
